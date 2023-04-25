@@ -1,63 +1,64 @@
 import { useEffect, useState } from "react";
-import Button from "./UI/Button";
+import Button from "../components/UI/Button";
 
-export default function Timer() {
-  const [timerRunning, setTimerRunning] = useState(false);
-  const [seconds, setSeconds] = useState(0);
+export default function Timer({ className }) {
+  const [timerRunning, setTimerRunning] = useState<boolean>(false);
+  const [seconds, setSeconds] = useState<number>(25 * 60);
+  // 25 minutes by 60 seconds
 
   useEffect(() => {
-    let interval = null;
+    let interval: NodeJS.Timeout | null = null;
     console.log("use effect ran");
 
     if (timerRunning) {
       interval = setInterval(() => {
-        setSeconds((seconds) => seconds + 1);
+        setSeconds((seconds) => seconds - 1);
       }, 1000);
     } else if (!timerRunning && seconds !== 0) {
-      clearInterval(interval);
+      clearInterval(interval!);
     }
 
-    return () => clearInterval(interval);
+    return () => clearInterval(interval!);
   }, [timerRunning, seconds]);
 
-  const clickHandler = (event) => {
+  const timerHandler = (event) => {
     console.log(event);
 
-    const date = new Date(Date.now() + 15000).getTime();
-    console.log(new Date().getTime(), date);
-
-    // check if we are already running
-    // Get our current time
-    // Add the amount of the timer to our current time
-    // set an interval that updates the time
-
-    // display the new time at each interval tick
     setTimerRunning((prevState) => {
       // timer was already running, we stopped the timer
       if (prevState) {
-        // clearInterval(timerInterval);
         setTimerRunning(false);
       } else {
-        setSeconds(0);
+        // start the timer
+        setSeconds(25 * 60);
         setTimerRunning(true);
-        // we started the timer now
-        // const timerInterval = setInterval(() => {
-        //   setTimerRunning(true);
-        //   console.log("running");
-        // }, 1000);
       }
       return !prevState;
     });
   };
 
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+
   return (
-    <Button
-      className="bg-amber-800 hover:bg-amber-900 text-white font-bold py-2 px-4 border-b-4 border-amber-700 hover:border-amber-800 rounded"
-      onClick={clickHandler}
-    >
-      {timerRunning && "Stop Timer"}
-      {seconds}
-      {!timerRunning && "Start Timer"}
-    </Button>
+    <div className={className}>
+      <div className="text-[40px]">{`${minutes}:${remainingSeconds
+        .toString()
+        .padStart(2, "0")}`}</div>
+      <div className="buttonContainer mt-8">
+        <Button
+          className="bg-amber-800 mr-4 hover:bg-amber-900 text-white font-bold py-2 px-4 border-b-4 border-amber-700 hover:border-amber-800 pa rounded"
+          onClick={timerHandler}
+        >
+          {timerRunning ? "Stop Timer" : "Start Timer"}
+        </Button>
+        <Button
+          className="bg-amber-800 hover:bg-amber-900 text-white font-bold py-2 px-4 border-b-4 border-amber-700 hover:border-amber-800 rounded"
+          onClick={timerHandler}
+        >
+          Reset Timer
+        </Button>
+      </div>
+    </div>
   );
 }
