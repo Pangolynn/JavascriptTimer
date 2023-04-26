@@ -13,7 +13,7 @@ export default function Home() {
           Java<sub className="align-middle">(script)</sub> Timer
         </h1>
         <hr className="yellow-500"></hr>
-        <Timer className="rounded container mx-auto mt-10 p-10 max-w-lg bg-opacity-50 bg-white"></Timer>
+        <Timer className="timer rounded container mx-auto mt-10 p-10 max-w-lg bg-opacity-50 bg-white"></Timer>
       </div>
     </main>
   );

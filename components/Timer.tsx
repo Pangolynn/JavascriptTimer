@@ -1,14 +1,18 @@
 import { useEffect, useState } from "react";
 import Button from "../components/UI/Button";
 
-export default function Timer({ className }) {
+type TimerProps = {
+  className?: string;
+};
+
+export default function Timer({ className }: TimerProps) {
   const [timerRunning, setTimerRunning] = useState<boolean>(false);
-  const [seconds, setSeconds] = useState<number>(25 * 60);
-  // 25 minutes by 60 seconds
+  const [timerAmount, setTimerAmount] = useState(25 * 60);
+  const [seconds, setSeconds] = useState<number>(timerAmount);
+  const [paused, setPaused] = useState<boolean>(false);
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
-    console.log("use effect ran");
 
     if (timerRunning) {
       interval = setInterval(() => {
@@ -30,7 +34,7 @@ export default function Timer({ className }) {
         setTimerRunning(false);
       } else {
         // start the timer
-        setSeconds(25 * 60);
+        setSeconds(timerAmount);
         setTimerRunning(true);
       }
       return !prevState;
@@ -39,6 +43,15 @@ export default function Timer({ className }) {
 
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = seconds % 60;
+
+  const amountHandler = (event) => {
+    let entry = event.target.amount.value;
+    let minutes = entry * 60;
+    console.log(minutes);
+    event.preventDefault();
+    setTimerAmount(minutes);
+    setSeconds(minutes);
+  };
 
   return (
     <div className={className}>
@@ -58,6 +71,13 @@ export default function Timer({ className }) {
         >
           Reset Timer
         </Button>
+        <form className="mt-8 flex flex-col" onSubmit={amountHandler}>
+          <label htmlFor="amount" />
+          <input type="number" id="amount" />
+          <Button className="bg-amber-400 hover:bg-amber-900 text-white font-bold py-2 px-4 border-b-4 border-amber-700 hover:border-amber-800 rounded">
+            Custom Timer
+          </Button>
+        </form>
       </div>
     </div>
   );
