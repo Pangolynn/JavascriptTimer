@@ -18,12 +18,21 @@ export default function Timer({ className }: TimerProps) {
       interval = setInterval(() => {
         setSeconds((seconds) => seconds - 1);
       }, 1000);
+    } else if (paused) {
+      console.log(timerAmount);
+      clearInterval(interval!);
     } else if (!timerRunning && seconds !== 0) {
       clearInterval(interval!);
     }
 
+    // Check if timer is done
+    if (seconds === 0) {
+      clearInterval(interval!);
+      setTimerRunning(false);
+    }
+
     return () => clearInterval(interval!);
-  }, [timerRunning, seconds]);
+  }, [timerRunning, seconds, paused, timerAmount]);
 
   const timerHandler = (event) => {
     console.log(event);
@@ -31,9 +40,11 @@ export default function Timer({ className }: TimerProps) {
     setTimerRunning((prevState) => {
       // timer was already running, we stopped the timer
       if (prevState) {
+        setPaused(true);
         setTimerRunning(false);
       } else {
         // start the timer
+        setPaused(false);
         setSeconds(timerAmount);
         setTimerRunning(true);
       }
@@ -41,8 +52,10 @@ export default function Timer({ className }: TimerProps) {
     });
   };
 
-  const minutes = Math.floor(seconds / 60);
+  const minutes = Math.floor(seconds / 60) % 60;
+  console.log(minutes);
   const remainingSeconds = seconds % 60;
+  const hours = Math.floor(Math.floor(seconds / 60) / 60);
 
   const amountHandler = (event) => {
     let entry = event.target.amount.value;
@@ -53,9 +66,16 @@ export default function Timer({ className }: TimerProps) {
     setSeconds(minutes);
   };
 
+  const resetTimer = () => {
+    setTimerRunning(false);
+    setSeconds(timerAmount);
+  };
+
   return (
     <div className={className}>
-      <div className="text-[40px]">{`${minutes}:${remainingSeconds
+      <div className="text-[40px]">{`${hours}:${minutes
+        .toString()
+        .padStart(2, "0")}:${remainingSeconds
         .toString()
         .padStart(2, "0")}`}</div>
       <div className="buttonContainer mt-8">
@@ -67,13 +87,13 @@ export default function Timer({ className }: TimerProps) {
         </Button>
         <Button
           className="bg-amber-800 hover:bg-amber-900 text-white font-bold py-2 px-4 border-b-4 border-amber-700 hover:border-amber-800 rounded"
-          onClick={timerHandler}
+          onClick={resetTimer}
         >
           Reset Timer
         </Button>
         <form className="mt-8 flex flex-col" onSubmit={amountHandler}>
           <label htmlFor="amount" />
-          <input type="number" id="amount" />
+          <input max="5999" type="number" id="amount" />
           <Button className="bg-amber-400 hover:bg-amber-900 text-white font-bold py-2 px-4 border-b-4 border-amber-700 hover:border-amber-800 rounded">
             Custom Timer
           </Button>
